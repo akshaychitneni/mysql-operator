@@ -24,7 +24,7 @@ spec:
       containers:
       - name: mysql-operator-controller
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        image: {{ .Values.image.registry }}/mysql-operator:{{ .Values.image.tag }}
+        image: {{ .Values.operator.registry }}/mysql-operator:{{ .Values.operator.tag }}
         ports:
         - containerPort: 10254
         args:

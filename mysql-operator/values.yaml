@@ -4,6 +4,8 @@ operator:
   namespace: mysql-operator
   global: true
   register_crd: true
+  registry: akshaychitneni
+  tag: password
 image:
   registry: iad.ocir.io/oracle
   tag: 0.3.0
