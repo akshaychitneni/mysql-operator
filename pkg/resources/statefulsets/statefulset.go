@@ -227,7 +227,8 @@ func mysqlServerContainer(cluster *v1alpha1.Cluster, mysqlServerImage string, ro
 }
 
 func mysqlAgentContainer(cluster *v1alpha1.Cluster, mysqlAgentImage string, rootPassword v1.EnvVar, members int) v1.Container {
-	agentVersion := version.GetBuildVersion()
+	//agentVersion := version.GetBuildVersion()
+	agentVersion := "latest"
 	if version := os.Getenv("MYSQL_AGENT_VERSION"); version != "" {
 		agentVersion = version
 	}

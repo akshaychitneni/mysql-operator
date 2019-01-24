@@ -405,6 +405,10 @@ func (m *MySQLController) syncHandler(key string) error {
 		return errors.Wrap(err, "ensuring MySQL version")
 	}
 
+	if err := m.ensureRootPassword(cluster, ss); err != nil {
+		return errors.Wrap(err, "ensuring MySQL version")
+	}
+
 	// If this number of the members on the Cluster does not equal the
 	// current desired replicas on the StatefulSet, we should update the
 	// StatefulSet resource.
@@ -489,6 +493,27 @@ func (m *MySQLController) ensureMySQLVersion(c *v1alpha1.Cluster, ss *apps.State
 		return errors.Wrap(err, "patching StatefulSet")
 	}
 
+	return nil
+}
+
+func (m *MySQLController) ensureRootPassword(c *v1alpha1.Cluster, ss *apps.StatefulSet) error {
+	updated := ss.DeepCopy()
+	for _, cn := range updated.Spec.Template.Spec.Containers {
+		if cn.Name == "mysql" {
+			for _, env := range cn.Env {
+				if env.Name == "MYSQL_ROOT_PASSWORD" && env.ValueFrom.SecretKeyRef.Name != c.Spec.RootPasswordSecret.Name {
+					env.ValueFrom.SecretKeyRef.Name = c.Spec.RootPasswordSecret.Name
+					updated.Spec.UpdateStrategy = apps.StatefulSetUpdateStrategy{
+						Type: apps.RollingUpdateStatefulSetStrategyType,
+					}
+					err := m.statefulSetControl.Patch(ss, updated)
+					if err != nil {
+						return errors.Wrap(err, "patching StatefulSet")
+					}
+				}
+			}
+		}
+	}
 	return nil
 }
 
