@@ -396,9 +396,9 @@ func (m *MySQLController) syncHandler(key string) error {
 	}
 
 	// Upgrade the required component resources the current MySQLOperator version.
-	if err := m.ensureMySQLOperatorVersion(cluster, ss, buildversion.GetBuildVersion()); err != nil {
+	/*if err := m.ensureMySQLOperatorVersion(cluster, ss, buildversion.GetBuildVersion()); err != nil {
 		return errors.Wrap(err, "ensuring MySQL Operator version")
-	}
+	}*/
 
 	// Upgrade the MySQL server version if required.
 	if err := m.ensureMySQLVersion(cluster, ss); err != nil {
@@ -510,6 +510,7 @@ func (m *MySQLController) ensureRootPassword(c *v1alpha1.Cluster, ss *apps.State
 					if err != nil {
 						return errors.Wrap(err, "patching StatefulSet")
 					}
+					m.recorder.Event(c, corev1.EventTypeNormal, "PasswordChange", "Change in root password")
 				}
 			}
 		}
